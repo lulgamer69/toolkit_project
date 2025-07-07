@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word to PDF Converter</title>
+</head>
+<body>
+  <h1>Welcome to my Word2PDF Tool</h1>
+
+  <!-- File upload form -->
+  <form action="" method="post">
+    <!-- Input field to choose only Word/PDF files -->
+    <input type="file" name="file" accept=".doc,.docx,.pdf" required>
+    <button type="submit">Convert To PDF</button>
+  </form>
+</body>
+
+<!-- JavaScript for handling form submission and file download -->
+<script>
+  // Listen for form submit
+  document.querySelector('form').addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent default form refresh
+
+    // Get the uploaded file from input field
+    const fileInput = document.querySelector('input');
+    const file = fileInput.files[0];
+
+    // Create a FormData object to send file in POST body
+    const form = new FormData();
+    form.append('file', file); // Append the file with name "file"
+
+    // Send the form data to Flask backend using fetch POST
+    fetch('/convert', {
+      method: 'POST',
+      body: form
+    })
+    .then(response => response.blob()) // Convert response to binary blob (PDF file)
+    .then(blob => {
+      // Create a temporary download link
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+
+      // Dynamically generate PDF file name (same as uploaded docx)
+      const originalName = file.name; // e.g., resume.docx
+      const pdfName = originalName.replace(/\.(docx|doc)$/i, '.pdf'); // resume.pdf
+
+      link.download = pdfName; // Set the download name
+      link.click(); // Simulate click to trigger browser download
+    })
+    .catch(error => {
+      console.error('Error occurred:', error); // Log error in console
+      alert('Something went wrong! Please try again.'); // Show error alert to user
+    });
+  });
+</script>
+</html>
+
+ // fetch ek promise return karta hai, jo response ko handle karne ke liye use hota hai, woh promise ko .then() method se handle kar raha hu
+        // yaha main response ko blob main convert kar raha hu(binary large object)
+        // fir link create kar raha hu jisse download ho sake(a tag joh hai woh automatically download kar dega aur a tag invisible hai)
+        // fir link ko click kar raha hu taki file download ho sake(a tag automatically click ho jayega)
+        // agar error aata hai to console main error show kar raha hu aur alert bhej raha hu(agar kuch galat hota hai to alert show karega user ko)
